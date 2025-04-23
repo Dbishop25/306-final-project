@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YumDash Purchase</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #fff0f5, #e0ffff);
+      color: #333;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+    body.dark {
+      background: linear-gradient(135deg, #2c2c2c, #1a1a1a);
+      color: #eee;
+    }
+    .bag-icon {
+      position: relative;
+      font-size: 2rem;
+      cursor: default;
+    }
+    .bag-icon.pulse {
+      animation: pulse 0.3s ease-in-out;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+    .cart-count {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background-color: #ff6f61;
+      color: white;
+      font-size: 0.75rem;
+      padding: 3px 7px;
+      border-radius: 50%;
+    }
+    .food-option:hover img {
+      transform: scale(1.1);
+    }
+    .food-option:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(255, 105, 180, 0.3);
+      background: linear-gradient(135deg, #ffd6ff, #fcb9b2);
+    }
+    .theme-toggle {
+      position: fixed;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .theme-toggle:hover {
+      transform: scale(1.2);
+    }
+    #purchase-details {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="theme-toggle" onclick="toggleTheme()">🌙</div>
+
+  <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="text-primary">Select your order</h1>
+      <div class="bag-icon">
+        🛍️<span id="cart-count" class="cart-count">0</span>
+      </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3">
+      <div class="col">
+        <div class="card food-option text-center p-2" onclick="addToCart('Italian Beef', 15.99)">
+          <img src="https://media.istockphoto.com/id/1325121979/photo/homemade-chicago-italian-beef-sandwich.webp?a=1&b=1&s=612x612&w=0&k=20&c=skJtbVC3jirp4K_-7lYtGCUu4ox8c85Mbv_varROlDU=">
+          <div class="card-body"><p class="card-text">Italian Beef - $15.99</p></div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card food-option text-center p-2" onclick="addToCart('Hot Dogs', 3.99)">
+          <img src="https://media.istockphoto.com/id/2159509154/photo/gourmet-hotdogs-with-relish-and-onions.webp?a=1&b=1&s=612x612&w=0&k=20&c=LWNM3mwWzbF6ktYP0qDE1UOiNMRxhN8-LQikO6dqv_8=" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px;">
+          <div class="card-body"><p class="card-text">Hot Dogs - $3.99</p></div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card food-option text-center p-2" onclick="addToCart('Burger', 12.99)">
+          <img src="https://www.foodandwine.com/thmb/XE8ubzwObCIgMw7qJ9CsqUZocNM=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/MSG-Smash-Burger-FT-RECIPE0124-d9682401f3554ef683e24311abdf342b.jpg" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px;">
+          <div class="card-body"><p class="card-text">Burger - $12.99</p></div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card food-option text-center p-2" onclick="addToCart('Drink', 1.99)">
+          <img src="https://www.webstaurantstore.com/images/products/large/51713/698307.jpg" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px;">
+          <div class="card-body"><p class="card-text">Drink - $1.99</p></div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card food-option text-center p-2" onclick="addToCart('Ice Cream', 4.49)">
+          <img src="https://veenaazmanov.com/wp-content/uploads/2017/07/Homemade-Chocolate-Ice-Cream-3.jpg" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px;">
+          <div class="card-body"><p class="card-text">Ice Cream - $4.49</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-4 p-3">
+      <h5>Your Cart:</h5>
+      <ul id="cart-items" class="list-group list-group-flush">
+        <li class="list-group-item text-muted">Cart is empty.</li>
+      </ul>
+      <div class="mt-2"><strong>Total:</strong> $<span id="total">0.00</span></div>
+    </div>
+
+    <button class="btn btn-success mt-3" onclick="finishOrder()">✅ Finish Your Order</button>
+
+    <div id="purchase-details" class="mt-4 card p-4">
+      <h5 class="mb-3">Enter Your Payment Info</h5>
+      <div class="mb-3">
+        <label for="buyer-name" class="form-label">Name</label>
+        <input type="text" id="buyer-name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="card-number" class="form-label">Credit Card Number</label>
+        <input type="text" id="card-number" class="form-control" maxlength="16" required>
+      </div>
+      <div class="mb-3">
+        <label for="payment-type" class="form-label">Payment Type</label>
+        <select id="payment-type" class="form-select">
+          <option value="Credit Card">Credit Card</option>
+          <option value="Debit Card">Debit Card</option>
+          <option value="Gift Card">Gift Card</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="submitPurchase()">💳 Submit Purchase</button>
+    </div>
+
+    <div id="confirmation" class="mt-4 text-center fw-bold"></div>
+  </div>
+
+  <footer class="text-center mt-5 mb-3 text-muted">© 2025 YumDash · All rights reserved.</footer>
+
+  <script>
+    const cart = [];
+    let total = 0;
+
+    function addToCart(item, price) {
+      cart.push({ item, price });
+      total += price;
+      updateCart();
+      const bagIcon = document.querySelector('.bag-icon');
+      bagIcon.classList.add('pulse');
+      setTimeout(() => bagIcon.classList.remove('pulse'), 300);
+    }
+
+    function updateCart() {
+      const cartList = document.getElementById('cart-items');
+      const cartCount = document.getElementById('cart-count');
+      cartList.innerHTML = '';
+      if (cart.length === 0) {
+        cartList.innerHTML = '<li class="list-group-item text-muted">Cart is empty.</li>';
+      } else {
+        cart.forEach((entry, index) => {
+          const li = document.createElement('li');
+          li.className = 'list-group-item';
+          li.textContent = `${index + 1}. ${entry.item} - $${entry.price.toFixed(2)}`;
+          cartList.appendChild(li);
+        });
+      }
+      document.getElementById('total').textContent = total.toFixed(2);
+      cartCount.textContent = cart.length;
+    }
+
+    function finishOrder() {
+      if (cart.length === 0) {
+        document.getElementById('confirmation').textContent = 'Your cart is empty!';
+        return;
+      }
+      document.getElementById('purchase-details').style.display = 'block';
+      document.getElementById('confirmation').textContent = '';
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function submitPurchase() {
+      const name = document.getElementById('buyer-name').value.trim();
+      const card = document.getElementById('card-number').value.trim();
+      const paymentType = document.getElementById('payment-type').value;
+      const confirmation = document.getElementById('confirmation');
+
+      if (!name || !card || card.length < 12 || isNaN(card)) {
+        alert('Please enter a valid name and credit card number (min 12 digits).');
+        return;
+      }
+
+      const orderId = Math.floor(100000 + Math.random() * 900000);
+      const items = cart.map(entry => entry.item).join(', ');
+
+      confirmation.innerHTML = `
+        ✅ <strong>Order Confirmed!</strong><br>
+        <strong>Purchase ID:</strong> ${orderId}<br>
+        <strong>Name:</strong> ${name}<br>
+        <strong>Payment Type:</strong> ${paymentType}<br>
+        <strong>Card #:</strong> **** **** **** ${card.slice(-4)}<br>
+        <strong>Items:</strong> ${items}<br>
+        <strong>Total:</strong> $${total.toFixed(2)}
+      `;
+
+      cart.length = 0;
+      total = 0;
+      updateCart();
+      document.getElementById('purchase-details').style.display = 'none';
+      document.getElementById('buyer-name').value = '';
+      document.getElementById('card-number').value = '';
+      document.getElementById('payment-type').selectedIndex = 0;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+    }
+  </script>
+</body>
+</html>
